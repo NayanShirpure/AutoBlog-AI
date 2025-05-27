@@ -12,7 +12,7 @@ type Props = {
   params: { slug: string };
 };
 
-const siteBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
+const siteBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://auto-blog-ai-alpha.vercel.app/';
 
 export async function generateStaticParams() {
   const slugs = getPostSlugs();
@@ -36,7 +36,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ogImageUrl = post.featuredImage;
     } 
     // Data URIs are not ideal for OG images, so we use the placeholder if it's not an HTTP URL
+    // For data URIs, we will let the default placeholder be used unless a better strategy is implemented.
   }
+
 
   return {
     title: post.title,
@@ -87,7 +89,7 @@ export default async function PostPage({ params }: Props) {
       ? post.featuredImage 
       : `https://placehold.co/1200x630.png?text=${encodeURIComponent(post.title)}`, // Fallback for schema image
     author: {
-      '@type': 'Organization',
+      '@type': 'Organization', // Using Organization as author, can be Person
       name: 'AutoBlog AI', 
       url: siteBaseUrl, 
     },

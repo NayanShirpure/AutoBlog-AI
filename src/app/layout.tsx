@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-const siteBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
+const siteBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://auto-blog-ai-alpha.vercel.app/';
 const defaultOgImage = `https://placehold.co/1200x630.png?text=AutoBlog+AI`;
 
 export const metadata: Metadata = {

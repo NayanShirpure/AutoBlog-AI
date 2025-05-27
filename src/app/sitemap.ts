@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { getAllPosts, type PostMeta } from '@/lib/posts';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://auto-blog-ai-alpha.vercel.app/';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const posts = getAllPosts();

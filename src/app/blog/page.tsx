@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
-const siteBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
+const siteBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://auto-blog-ai-alpha.vercel.app/';
 const blogPageOgImage = `https://placehold.co/1200x630.png?text=AutoBlog+AI+Blog`;
 
 export const metadata: Metadata = {

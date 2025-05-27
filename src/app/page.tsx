@@ -6,7 +6,7 @@ import { Sparkles, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 
-const siteBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
+const siteBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://auto-blog-ai-alpha.vercel.app/';
 const homePageOgImage = `https://placehold.co/1200x630.png?text=Welcome+to+AutoBlog+AI`;
 
 export const metadata: Metadata = {
