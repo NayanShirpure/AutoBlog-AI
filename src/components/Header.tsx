@@ -1,6 +1,8 @@
+
 import Link from 'next/link';
 import { Newspaper, Sparkles, HomeIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export function Header() {
   return (
@@ -29,6 +31,7 @@ export function Header() {
               Generate Post
             </Link>
           </Button>
+          <ThemeToggle />
         </nav>
       </div>
     </header>
