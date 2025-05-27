@@ -3,7 +3,6 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import type { PostMeta } from '@/lib/posts';
 import { format } from 'date-fns';
 import { CalendarDays, ArrowRight } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 
 interface PostCardProps {
   post: PostMeta;
@@ -28,7 +27,7 @@ export function PostCard({ post }: PostCardProps) {
       </CardContent>
       <CardFooter>
         <Link href={`/blog/${post.slug}`} className="text-sm font-medium text-primary hover:underline flex items-center">
-          Read more <ArrowRight className="ml-1 h-4 w-4" />
+          {`Read article: "${post.title}"`} <ArrowRight className="ml-1 h-4 w-4" />
         </Link>
       </CardFooter>
     </Card>
