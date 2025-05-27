@@ -11,6 +11,7 @@ export interface Post {
   date: string;
   summary: string;
   content: string;
+  featuredImage?: string; // Added for AI generated image
   [key: string]: any; // For any other frontmatter properties
 }
 
@@ -19,6 +20,7 @@ export interface PostMeta {
   title: string;
   date: string;
   summary: string;
+  featuredImage?: string; // Added for AI generated image
   [key: string]: any;
 }
 
@@ -27,7 +29,6 @@ export function getPostSlugs(): string[] {
     const fileNames = fs.readdirSync(postsDirectory);
     return fileNames.map((fileName) => fileName.replace(/\.mdx$/, ''));
   } catch (error) {
-    // If the directory doesn't exist, return an empty array
     if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
       return [];
     }
@@ -46,6 +47,7 @@ export function getPostBySlug(slug: string): Post | null {
       title: data.title || 'Untitled Post',
       date: data.date ? new Date(data.date).toISOString() : new Date().toISOString(),
       summary: data.summary || '',
+      featuredImage: data.featuredImage, // Read featuredImage
       content,
       ...data,
     };
@@ -72,6 +74,7 @@ export function getAllPosts(): PostMeta[] {
           title: data.title || 'Untitled Post',
           date: data.date ? new Date(data.date).toISOString() : new Date().toISOString(),
           summary: data.summary || 'No summary available.',
+          featuredImage: data.featuredImage, // Read featuredImage
           ...data,
         };
       })
@@ -79,7 +82,6 @@ export function getAllPosts(): PostMeta[] {
     return allPostsData;
   } catch (error) {
     if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
-      // If the directory doesn't exist, create it and return an empty array
       fs.mkdirSync(postsDirectory, { recursive: true });
       return [];
     }
@@ -87,22 +89,35 @@ export function getAllPosts(): PostMeta[] {
   }
 }
 
-export async function createPostFile(title: string, content: string, summary: string): Promise<string> {
+export async function createPostFile(
+  title: string, 
+  content: string, 
+  summary: string,
+  featuredImage?: string // New parameter for image data URI
+): Promise<string> {
   const slug = title
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '') // Remove non-word characters except spaces and hyphens
-    .replace(/\s+/g, '-') // Replace spaces with hyphens
-    .replace(/--+/g, '-') // Replace multiple hyphens with single hyphen
-    .replace(/^-+|-+$/g, ''); // Trim hyphens from start/end
+    .replace(/[^\w\s-]/g, '') 
+    .replace(/\s+/g, '-') 
+    .replace(/--+/g, '-') 
+    .replace(/^-+|-+$/g, ''); 
 
   const date = formatISO(new Date());
 
-  const frontmatter = `---
+  let frontmatter = `---
 title: "${title.replace(/"/g, '\\"')}"
 date: "${date}"
 slug: "${slug}"
 summary: "${summary.replace(/"/g, '\\"')}"
----
+`;
+
+  if (featuredImage) {
+    // Ensure the data URI is properly quoted if it contains special characters,
+    // though base64 itself should be fine. Using double quotes for consistency.
+    frontmatter += `featuredImage: "${featuredImage}"\n`;
+  }
+
+  frontmatter += `---
 
 ${content}
 `;

@@ -29,7 +29,9 @@ const prompt = ai.definePrompt({
   name: 'generateBlogPostPrompt',
   input: {schema: GenerateBlogPostInputSchema},
   output: {schema: GenerateBlogPostOutputSchema},
-  prompt: `Write a 600-word SEO blog post titled \"{{{title}}}\". Include intro, 5 sections, conclusion, and use markdown.`,
+  prompt: `Write a detailed 1000-word SEO blog post titled \"{{{title}}}\". 
+The post should include an engaging introduction, at least 5-7 distinct sections with in-depth explanations, examples, or insights, and a comprehensive conclusion. 
+Ensure the content is well-structured, informative, and engaging for the reader. Use markdown for formatting.`,
 });
 
 const generateBlogPostFlow = ai.defineFlow(

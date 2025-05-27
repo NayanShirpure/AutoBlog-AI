@@ -1,7 +1,9 @@
+// src/actions/blogActions.ts
 'use server';
 
 import { generateBlogPost, type GenerateBlogPostInput } from '@/ai/flows/generate-blog-post';
 import { summarizeBlogPost, type SummarizeBlogPostInput } from '@/ai/flows/summarize-blog-posts';
+import { generateBlogImage, type GenerateBlogImageInput } from '@/ai/flows/generate-blog-image-flow';
 import { createPostFile } from '@/lib/posts';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
@@ -47,6 +49,16 @@ export async function handleGeneratePost(
       return { message: 'AI failed to generate blog post content.', success: false };
     }
 
+    let imageDataUri: string | undefined = undefined;
+    try {
+      const imageInput: GenerateBlogImageInput = { title };
+      const imageOutput = await generateBlogImage(imageInput);
+      imageDataUri = imageOutput.imageDataUri;
+    } catch (imageError) {
+      console.warn('Image generation failed, proceeding without image:', imageError instanceof Error ? imageError.message : String(imageError));
+      // Optionally, add a message to the user here if needed
+    }
+
     const summarizeInput: SummarizeBlogPostInput = { blogPostContent: blogPostOutput.content };
     const summaryOutput = await summarizeBlogPost(summarizeInput);
 
@@ -54,7 +66,7 @@ export async function handleGeneratePost(
       return { message: 'AI failed to generate summary.', success: false };
     }
 
-    const newSlug = await createPostFile(title, blogPostOutput.content, summaryOutput.summary);
+    const newSlug = await createPostFile(title, blogPostOutput.content, summaryOutput.summary, imageDataUri);
 
     // Revalidate paths to show new post immediately
     revalidatePath('/');
