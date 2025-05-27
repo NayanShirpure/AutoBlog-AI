@@ -1,3 +1,4 @@
+
 // src/ai/flows/generate-blog-image-flow.ts
 'use server';
 /**
@@ -13,6 +14,8 @@ import {z} from 'genkit';
 
 const GenerateBlogImageInputSchema = z.object({
   title: z.string().describe('The title of the blog post to generate an image for.'),
+  // Optional: Add summary or a snippet of content if available and useful for context
+  // contentHint: z.string().optional().describe('A brief snippet or summary of the blog post content for better image context.') 
 });
 export type GenerateBlogImageInput = z.infer<typeof GenerateBlogImageInputSchema>;
 
@@ -34,7 +37,12 @@ const generateBlogImageFlow = ai.defineFlow(
   async (input) => {
     const {media} = await ai.generate({
       model: 'googleai/gemini-2.0-flash-exp', 
-      prompt: `Generate a visually appealing and relevant blog post hero image for an article titled: "${input.title}". The image should be suitable for a tech, general interest, or creative blog. Focus on abstract concepts, artistic interpretations, or metaphors related to the title. Avoid including any text in the image. The style should be modern and clean.`,
+      prompt: `Generate a highly relevant and visually compelling hero image for a blog post titled: "${input.title}". 
+The image should directly reflect the core subject matter of the title. 
+For example, if the title is "The Future of Quantum Computing", the image should be about quantum computing, not just abstract shapes.
+If the title is "Healthy Baking Recipes", depict appealing baked goods or ingredients.
+Avoid text in the image. The style should be modern, clean, and professional.
+Focus on creating an image that a reader would immediately associate with the blog post's topic based on the title.`,
       config: {
         responseModalities: ['TEXT', 'IMAGE'], 
       },
@@ -47,3 +55,4 @@ const generateBlogImageFlow = ai.defineFlow(
     return {imageDataUri: media.url};
   }
 );
+
