@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /private/
 
-Sitemap: ${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002'}/sitemap.xml
+Sitemap: https://auto-blog-ai-alpha.vercel.app/sitemap.xml
