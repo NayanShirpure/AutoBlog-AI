@@ -1,8 +1,8 @@
 
 'use client';
 
-import React, { useEffect, useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
+import { useActionState, useEffect } from 'react';
 import { handleGeneratePost, type GeneratePostFormState } from '@/actions/blogActions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -132,3 +132,6 @@ export default function GeneratePostPage() {
             <p>AI generation may take a few moments. Please be patient. Ensure your admin token is set correctly.</p>
         </CardFooter>
       </Card>
+    </div>
+  );
+}
