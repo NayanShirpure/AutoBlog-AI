@@ -26,7 +26,7 @@ export function PostCard({ post }: PostCardProps) {
         </CardDescription>
       </CardContent>
       <CardFooter>
-        <Link href={`/blog/${post.slug}`} className="text-sm font-medium text-primary hover:underline flex items-center">
+        <Link href={`/blog/${post.slug}`} className="text-sm font-medium text-accent-foreground hover:text-accent-foreground/90 flex items-center">
           {`Read article: "${post.title}"`} <ArrowRight className="ml-1 h-4 w-4" />
         </Link>
       </CardFooter>

@@ -147,7 +147,7 @@ export default async function PostPage({ params }: Props) {
         <div className="prose prose-lg dark:prose-invert max-w-none 
                         prose-headings:font-bold prose-headings:text-foreground
                         prose-p:text-foreground/90
-                        prose-a:text-primary hover:prose-a:text-primary/80
+                        prose-a:text-accent-foreground hover:prose-a:text-accent-foreground/90
                         prose-strong:text-foreground
                         prose-blockquote:border-primary prose-blockquote:text-muted-foreground
                         prose-code:bg-muted prose-code:text-foreground prose-code:p-1 prose-code:rounded-md
