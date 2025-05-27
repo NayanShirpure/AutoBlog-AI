@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { CalendarDays, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import Image from 'next/image';
+import Image from 'next/image'; // Keep for potential future use or if some images are handled by next/image
 
 type Props = {
   params: { slug: string };
@@ -28,11 +28,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
   
-  // Note: Using data URIs directly in og:image is not reliably supported by all crawlers.
-  // A production app might upload the image to a CDN and use its URL here.
-  // For this prototype, we'll omit it from Open Graph if it's a data URI
-  // to avoid potential issues, or one could link to a placeholder.
-
   return {
     title: post.title,
     description: post.summary,
@@ -42,7 +37,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: 'article',
       publishedTime: post.date,
       url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/blog/${post.slug}`,
-      // images: post.featuredImage && post.featuredImage.startsWith('http') ? [{ url: post.featuredImage }] : undefined,
+      // Use hero image for Open Graph if it's a full URL (not data URI for broad compatibility)
+      images: post.featuredImage && post.featuredImage.startsWith('http') 
+        ? [{ url: post.featuredImage }] 
+        : (post.featuredImage ? [{ url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/placeholder-og.png` }] : undefined), // Fallback or omit data URIs
     },
   };
 }
@@ -53,6 +51,10 @@ export default async function PostPage({ params }: Props) {
   if (!post) {
     notFound();
   }
+
+  // Inline images are now part of post.content as HTML <img> tags.
+  // MDXRemote will render them. The styling is applied via classes on the <img> tags themselves.
+  // We can customize MDXRemote components if needed, but for simple <img> it might not be necessary.
 
   return (
     <article className="max-w-3xl mx-auto py-8">
@@ -74,13 +76,14 @@ export default async function PostPage({ params }: Props) {
 
       {post.featuredImage && (
         <div className="mb-8 overflow-hidden rounded-lg shadow-xl">
+          {/* Using next/image for the hero image for optimization benefits */}
           <Image 
             src={post.featuredImage} 
             alt={`Featured image for ${post.title}`} 
-            width={1200} // Define a base width for layout
-            height={600} // Define a base height for layout
-            className="w-full h-auto object-cover aspect-[2/1]" // Maintain aspect ratio
-            priority // Prioritize loading if it's LCP
+            width={1200} 
+            height={600} 
+            className="w-full h-auto object-cover aspect-[2/1]"
+            priority 
           />
         </div>
       )}
@@ -92,8 +95,19 @@ export default async function PostPage({ params }: Props) {
                       prose-strong:text-foreground
                       prose-blockquote:border-primary prose-blockquote:text-muted-foreground
                       prose-code:bg-muted prose-code:text-foreground prose-code:p-1 prose-code:rounded-md
-                      prose-li:marker:text-primary">
-        <MDXRemote source={post.content} />
+                      prose-li:marker:text-primary
+                      prose-img:rounded-lg prose-img:shadow-md prose-img:my-8 prose-img:mx-auto prose-img:block">
+        {/* 
+          Inline images are now part of post.content as HTML <img> tags like:
+          <img src="data:image/png;base64,..." alt="description" class="my-6 rounded-lg shadow-xl mx-auto block max-w-full h-auto aspect-video object-cover" />
+          The `prose-img` Tailwind Typography plugin styles will apply, and we've added custom classes directly to the img tag.
+        */}
+        <MDXRemote 
+          source={post.content} 
+          // No custom components needed for basic <img> tags.
+          // If we wanted to use next/image for inline images, we'd parse placeholders
+          // and pass a custom Image component here. For now, HTML <img> is simpler for dynamic injection.
+        />
       </div>
     </article>
   );

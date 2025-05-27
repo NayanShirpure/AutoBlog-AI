@@ -17,7 +17,7 @@ const GenerateBlogPostInputSchema = z.object({
 export type GenerateBlogPostInput = z.infer<typeof GenerateBlogPostInputSchema>;
 
 const GenerateBlogPostOutputSchema = z.object({
-  content: z.string().describe('The generated blog post content in markdown format.'),
+  content: z.string().describe('The generated blog post content in markdown format, potentially including image placeholders like [IMAGE_PLACEHOLDER: "prompt here"].'),
 });
 export type GenerateBlogPostOutput = z.infer<typeof GenerateBlogPostOutputSchema>;
 
@@ -29,9 +29,21 @@ const prompt = ai.definePrompt({
   name: 'generateBlogPostPrompt',
   input: {schema: GenerateBlogPostInputSchema},
   output: {schema: GenerateBlogPostOutputSchema},
-  prompt: `Write a detailed 1000-word SEO blog post titled \"{{{title}}}\". 
-The post should include an engaging introduction, at least 5-7 distinct sections with in-depth explanations, examples, or insights, and a comprehensive conclusion. 
-Ensure the content is well-structured, informative, and engaging for the reader. Use markdown for formatting.`,
+  prompt: `Write a detailed, high-quality, SEO-optimized blog post of at least 1500 words titled \"{{{title}}}\".
+The post must include:
+1. An engaging introduction.
+2. At least 7-10 distinct, well-developed sections covering the topic in depth. Provide comprehensive explanations, practical examples, data, or unique insights in each section.
+3. Identify 2 to 3 key moments or sections within the blog post where a relevant, illustrative image would significantly enhance reader understanding or engagement. For each identified location, insert a placeholder in the format: [IMAGE_PLACEHOLDER: "A concise, descriptive prompt for an AI image generator that visually represents this section's content. For example: 'A futuristic cityscape with flying cars' or 'A detailed infographic showing the carbon cycle'."]
+4. A strong concluding section that summarizes key takeaways and offers a final thought.
+Ensure the entire content is well-structured, informative, and engaging for the reader. Use markdown for all formatting.
+Do not include a hero image placeholder; only include placeholders for inline images as described above.
+The image prompts should be specific to the content of the section they are intended for.
+Strive for natural integration of these image placeholders within the flow of the text.
+Example of a placeholder:
+This is a paragraph discussing the future of AI.
+[IMAGE_PLACEHOLDER: "An advanced AI robot interacting with humans in a collaborative environment"]
+And the text continues after the placeholder.
+Ensure your response only contains the markdown content for the blog post.`,
 });
 
 const generateBlogPostFlow = ai.defineFlow(
