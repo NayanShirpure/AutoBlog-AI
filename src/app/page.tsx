@@ -1,3 +1,4 @@
+
 import { getAllPosts, type PostMeta } from '@/lib/posts';
 import { PostCard } from '@/components/PostCard';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,9 @@ const homePageOgImage = `https://placehold.co/1200x630.png?text=Welcome+to+AutoB
 export const metadata: Metadata = {
   title: 'AutoBlog AI - AI Powered Blogging Homepage',
   description: 'Welcome to AutoBlog AI. Effortlessly generate insightful, SEO-friendly blog posts with the power of AI.',
+  alternates: {
+    canonical: siteBaseUrl,
+  },
   openGraph: {
     title: 'AutoBlog AI - AI Powered Blogging Homepage',
     description: 'Welcome to AutoBlog AI. Effortlessly generate insightful, SEO-friendly blog posts with the power of AI.',
