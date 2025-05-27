@@ -1,18 +1,18 @@
 'use client';
 
-import { useActionState, useFormStatus } from 'react-dom'; // Kept useFormStatus from react-dom as it's correct
+import { useFormStatus } from 'react-dom'; // Corrected: Removed useActionState from react-dom import
 import { handleGeneratePost, type GeneratePostFormState } from '@/actions/blogActions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea'; // For potential future use, not needed for title
+// import { Textarea } from '@/components/ui/textarea'; // For potential future use, not needed for title
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal, Sparkles, Loader2 } from 'lucide-react';
-import React from 'react'; // Added React import for useActionState
+import React from 'react'; // Retained for React.useActionState
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -35,7 +35,7 @@ function SubmitButton() {
 
 export default function GeneratePostPage() {
   const initialState: GeneratePostFormState = { message: '', success: false };
-  const [state, formAction] = React.useActionState(handleGeneratePost, initialState); // Changed to React.useActionState
+  const [state, formAction] = React.useActionState(handleGeneratePost, initialState); // Correctly uses useActionState from 'react'
   const { toast } = useToast();
   const router = useRouter();
 
