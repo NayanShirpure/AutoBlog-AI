@@ -22,16 +22,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${BASE_URL}/blog`,
-      lastModified: new Date().toISOString(), // Or derive from latest post
+      lastModified: new Date().toISOString(), 
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     ...postEntries,
+    // The /generate page is admin-only, so it might not need to be in the sitemap,
+    // but keeping it for now doesn't hurt if you know the URL.
+    // You can remove it if you prefer.
     {
       url: `${BASE_URL}/generate`,
       lastModified: new Date().toISOString(),
       changeFrequency: 'monthly',
-      priority: 0.5,
+      priority: 0.1, // Lower priority as it's not for public consumption
     }
   ];
 }

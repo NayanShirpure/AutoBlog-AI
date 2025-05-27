@@ -1,3 +1,4 @@
+
 import { getPostBySlug, getPostSlugs, type Post } from '@/lib/posts';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import type { Metadata } from 'next';
@@ -35,8 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     if (post.featuredImage.startsWith('http')) {
       ogImageUrl = post.featuredImage;
     } 
-    // Data URIs are not ideal for OG images, so we use the placeholder if it's not an HTTP URL
-    // For data URIs, we will let the default placeholder be used unless a better strategy is implemented.
+    // For data URIs, we will let the default placeholder be used for OG images
   }
 
 
@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: post.summary,
       type: 'article',
       publishedTime: new Date(post.date).toISOString(),
-      modifiedTime: new Date(post.date).toISOString(), // Assuming post.date is effectively last modified time
+      modifiedTime: new Date(post.date).toISOString(), 
       url: `${siteBaseUrl}/blog/${post.slug}`,
       images: [
         { 
@@ -58,9 +58,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           alt: post.title,
         }
       ],
-      authors: ['AutoBlog AI'], // Or a more specific author if available
+      authors: ['Blog Author'], // Updated Author
     },
-    twitter: { // Basic Twitter card meta
+    twitter: { 
       card: 'summary_large_image',
       title: post.title,
       description: post.summary,
@@ -87,18 +87,18 @@ export default async function PostPage({ params }: Props) {
     description: post.summary,
     image: post.featuredImage && post.featuredImage.startsWith('http') 
       ? post.featuredImage 
-      : `https://placehold.co/1200x630.png?text=${encodeURIComponent(post.title)}`, // Fallback for schema image
+      : `https://placehold.co/1200x630.png?text=${encodeURIComponent(post.title)}`, 
     author: {
-      '@type': 'Organization', // Using Organization as author, can be Person
-      name: 'AutoBlog AI', 
-      url: siteBaseUrl, 
+      '@type': 'Person', // Or Organization
+      name: 'Blog Author', // Updated Author
+      // url: siteBaseUrl, // Optionally add author URL
     },
     publisher: {
       '@type': 'Organization',
-      name: 'AutoBlog AI',
+      name: 'My Awesome Blog', // Updated Publisher
       logo: {
         '@type': 'ImageObject',
-        url: `https://placehold.co/200x60.png?text=AutoBlog+AI+Logo`, // Replace with actual logo URL
+        url: `https://placehold.co/200x60.png?text=My+Awesome+Blog+Logo`, 
       },
        url: siteBaseUrl,
     },
@@ -132,7 +132,6 @@ export default async function PostPage({ params }: Props) {
 
         {post.featuredImage && (
           <div className="mb-8 overflow-hidden rounded-lg shadow-xl">
-            {/* Using next/image for the hero image for optimization benefits */}
             <Image 
               src={post.featuredImage} 
               alt={`Featured image for ${post.title}`} 
@@ -154,10 +153,3 @@ export default async function PostPage({ params }: Props) {
                         prose-li:marker:text-primary
                         prose-img:rounded-lg prose-img:shadow-md prose-img:my-8 prose-img:mx-auto prose-img:block">
           <MDXRemote 
-            source={post.content} 
-          />
-        </div>
-      </article>
-    </>
-  );
-}

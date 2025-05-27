@@ -1,17 +1,17 @@
+
 'use client';
 
+import React, { useEffect, useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { handleGeneratePost, type GeneratePostFormState } from '@/actions/blogActions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-// import { Textarea } from '@/components/ui/textarea'; // For potential future use, not needed for title
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { useEffect, useActionState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Terminal, Sparkles, Loader2 } from 'lucide-react';
+import { Terminal, Sparkles, Loader2, KeyRound } from 'lucide-react';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -66,7 +66,7 @@ export default function GeneratePostPage() {
         <CardHeader>
           <CardTitle className="text-3xl font-bold tracking-tight text-center">Generate a New Blog Post</CardTitle>
           <CardDescription className="text-center">
-            Enter a title for your blog post, and our AI will craft the content for you.
+            Enter a title for your blog post and the admin token. Our AI will craft the content for you.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -83,8 +83,27 @@ export default function GeneratePostPage() {
                 className="text-base"
                 defaultValue={state.fields?.title}
               />
-              {state.issues?.map((issue) => (
+              {state.issues?.filter(issue => !issue.startsWith("Admin token")).map((issue) => (
                   <p key={issue} className="text-sm text-destructive mt-1">{issue}</p>
+              ))}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="adminToken" className="text-lg font-medium flex items-center">
+                <KeyRound className="mr-2 h-5 w-5 text-muted-foreground" />
+                Admin Access Token
+              </Label>
+              <Input
+                id="adminToken"
+                name="adminToken"
+                type="password"
+                placeholder="Enter your secret token"
+                required
+                className="text-base"
+                defaultValue={state.fields?.adminToken}
+              />
+              {state.issues?.filter(issue => issue.startsWith("Admin token")).map((issue) => (
+                <p key={issue} className="text-sm text-destructive mt-1">{issue}</p>
               ))}
             </div>
             
@@ -110,9 +129,6 @@ export default function GeneratePostPage() {
 
         </CardContent>
          <CardFooter className="text-xs text-muted-foreground">
-            <p>AI generation may take a few moments. Please be patient.</p>
+            <p>AI generation may take a few moments. Please be patient. Ensure your admin token is set correctly.</p>
         </CardFooter>
       </Card>
-    </div>
-  );
-}

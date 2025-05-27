@@ -1,3 +1,4 @@
+
 // src/actions/blogActions.ts
 'use server';
 
@@ -10,6 +11,7 @@ import { z } from 'zod';
 
 const GeneratePostSchema = z.object({
   title: z.string().min(5, { message: 'Title must be at least 5 characters long.' }).max(150, { message: 'Title must be 150 characters or less.' }),
+  adminToken: z.string().min(1, { message: 'Admin token is required.' }),
 });
 
 export type GeneratePostFormState = {
@@ -26,6 +28,7 @@ export async function handleGeneratePost(
 ): Promise<GeneratePostFormState> {
   const rawFormData = {
     title: formData.get('title') as string,
+    adminToken: formData.get('adminToken') as string,
   };
 
   const validatedFields = GeneratePostSchema.safeParse(rawFormData);
@@ -40,6 +43,23 @@ export async function handleGeneratePost(
   }
   
   const title = validatedFields.data.title;
+  const adminToken = validatedFields.data.adminToken;
+
+  // Secure the action with an environment variable
+  const serverAdminToken = process.env.POST_GENERATION_TOKEN;
+  if (!serverAdminToken) {
+    console.error('POST_GENERATION_TOKEN is not set in the environment.');
+    return { message: 'Admin configuration error. Post generation is disabled.', success: false };
+  }
+
+  if (adminToken !== serverAdminToken) {
+    return {
+      message: 'Invalid admin token.',
+      fields: rawFormData,
+      issues: ['Admin token is incorrect.'],
+      success: false,
+    };
+  }
 
   try {
     // 1. Generate blog post content (may include image placeholders)
@@ -117,8 +137,3 @@ export async function handleGeneratePost(
     console.error('Error generating post:', error);
     let errorMessage = 'An unexpected error occurred while generating the post.';
     if (error instanceof Error) {
-        errorMessage = error.message;
-    }
-    return { message: `Failed to generate post: ${errorMessage}`, success: false };
-  }
-}
