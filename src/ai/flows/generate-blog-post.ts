@@ -36,7 +36,7 @@ The post must include:
 2. At least 7-10 distinct, well-developed sections covering the topic in depth. Provide comprehensive explanations, practical examples, data, or unique insights in each section.
 3. Identify 2 to 3 key moments or sections within the blog post where a relevant, illustrative image would significantly enhance reader understanding or engagement. For each identified location, insert a placeholder in the format: [IMAGE_PLACEHOLDER: "A concise, descriptive prompt for an AI image generator that visually represents this section's content. For example: 'A futuristic cityscape with flying cars' or 'A detailed infographic showing the carbon cycle'."]
 4. A strong concluding section that summarizes key takeaways and offers a final thought.
-5. Generate 3-5 relevant tags or categories for this blog post. Examples: "Artificial Intelligence", "Web Development", "Sustainable Living". These tags should be suitable for categorizing the post on a blog.
+5. Generate 3-5 tags that are highly relevant to the main subject matter and key concepts discussed in the blog post. These tags should be specific and help readers find posts on similar topics. For example, for a post about "The Future of AI in Healthcare", good tags might be "Artificial Intelligence", "Healthcare Technology", "Machine Learning", "Medical Innovation". Tags should be suitable for categorizing the post on a blog and preferably in title case (e.g., "Artificial Intelligence" not "artificial intelligence").
 
 Ensure the entire content is well-structured, informative, and engaging for the reader. Use markdown for all formatting.
 Do not include a hero image placeholder; only include placeholders for inline images as described above.
