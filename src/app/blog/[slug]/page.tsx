@@ -1,6 +1,6 @@
 
 import { getPostBySlug, getPostSlugs, type Post } from '@/lib/posts';
-import { slugify } from '@/lib/utils'; // Updated import path for slugify
+import { slugify } from '@/lib/utils';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils'; // Import cn utility
+import { cn } from '@/lib/utils';
 
 
 type Props = {
@@ -37,12 +37,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  let ogImageUrl = `https://placehold.co/1200x630.png?text=${encodeURIComponent(post.title)}`;
+  let ogImageUrl: string | undefined;
   if (post.featuredImage) {
-    if (post.featuredImage.startsWith('http')) {
-      ogImageUrl = post.featuredImage;
-    }
-    // For data URIs, we will let the default placeholder be used for OG images
+    ogImageUrl = post.featuredImage;
+  } else if (post.title) {
+    ogImageUrl = `https://placehold.co/1200x630.png?text=${encodeURIComponent(post.title)}`;
+  } else {
+    ogImageUrl = `https://placehold.co/1200x630.png?text=Blog+Post`; // Generic fallback
   }
 
 
@@ -55,16 +56,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: post.summary,
       type: 'article',
       publishedTime: new Date(post.date).toISOString(),
-      modifiedTime: new Date(post.date).toISOString(), // Or a separate updated_time field if you have it
+      modifiedTime: new Date(post.date).toISOString(),
       url: `${siteBaseUrl}blog/${post.slug}`,
-      images: [
+      images: ogImageUrl ? [
         {
           url: ogImageUrl,
           width: 1200,
           height: 630,
           alt: post.title,
         }
-      ],
+      ] : [],
       authors: ['Blog Author'],
       tags: post.tags,
     },
@@ -72,7 +73,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: 'summary_large_image',
       title: post.title,
       description: post.summary,
-      images: [ogImageUrl],
+      images: ogImageUrl ? [ogImageUrl] : [],
     },
   };
 }
@@ -81,15 +82,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 const mdxComponents = {
   // eslint-disable-next-line @next/next/no-img-element
   img: ({ className: mdxClassName, style: mdxStyle, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => {
-    // props might include 'class' if it came from raw HTML in MDX.
-    // props definitely includes 'alt' and 'src' from markdown ![alt](src)
-    // or from our embedded string which already includes a className.
-    const { class: htmlClass, ...restOfProps } = props as any; // Separate out 'class' if it exists from raw HTML
-
-    // Combine mdxClassName (if provided e.g. from our embedded component) and htmlClass (if from raw HTML with class)
-    // The prose-img:* classes will be applied by the parent div with 'prose'.
+    const { class: htmlClass, ...restOfProps } = props as any; 
     const combinedClassName = cn(htmlClass, mdxClassName);
-
     return <img {...restOfProps} className={combinedClassName} alt={props.alt || ""} />;
   },
 };
@@ -104,6 +98,15 @@ export default async function PostPage({ params }: Props) {
 
   const postUrl = `${siteBaseUrl}blog/${post.slug}`;
 
+  let schemaImage: string | undefined;
+  if (post.featuredImage) {
+    schemaImage = post.featuredImage;
+  } else if (post.title) {
+    schemaImage = `https://placehold.co/1200x630.png?text=${encodeURIComponent(post.title)}`;
+  } else {
+    schemaImage = `https://placehold.co/1200x630.png?text=My+Awesome+Blog`; // Generic fallback
+  }
+
   const articleSchema = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -113,9 +116,7 @@ export default async function PostPage({ params }: Props) {
     },
     headline: post.title,
     description: post.summary,
-    image: post.featuredImage && post.featuredImage.startsWith('http')
-      ? post.featuredImage
-      : `https://placehold.co/1200x630.png?text=${encodeURIComponent(post.title)}`,
+    image: schemaImage,
     author: {
       '@type': 'Person',
       name: 'Blog Author',
@@ -130,7 +131,7 @@ export default async function PostPage({ params }: Props) {
       url: siteBaseUrl,
     },
     datePublished: new Date(post.date).toISOString(),
-    dateModified: new Date(post.date).toISOString(), // Use a separate updated_time field if available
+    dateModified: new Date(post.date).toISOString(),
     keywords: post.tags?.join(', '),
   };
 
