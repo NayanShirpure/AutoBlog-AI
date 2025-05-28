@@ -121,7 +121,7 @@ export async function handleGeneratePost(
         
         if (result.status === 'fulfilled' && result.value.imageDataUri) {
           const sanitizedAlt = promptForAlt.replace(/"/g, "'").substring(0, 200);
-          return `<img src="${result.value.imageDataUri}" alt="${sanitizedAlt}" class="my-6 rounded-lg shadow-xl mx-auto block max-w-full h-auto aspect-video object-cover" />`;
+          return `<img src="${result.value.imageDataUri}" alt="${sanitizedAlt}" className="my-6 rounded-lg shadow-xl mx-auto block max-w-full h-auto aspect-video object-cover" />`;
         } else {
           console.warn(`Failed to generate inline image for prompt: "${promptForAlt}". Placeholder will be removed.`);
           if (result.status === 'rejected') {
