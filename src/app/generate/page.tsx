@@ -13,24 +13,10 @@ import { useRouter } from 'next/navigation';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal, Sparkles, Loader2, KeyRound, Copy } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
-import type { Metadata } from 'next';
+// Removed: import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'Generate New Post (Admin)',
-  robots: {
-    index: false,
-    follow: false,
-    nocache: true,
-    googleBot: {
-      index: false,
-      follow: false,
-      noimageindex: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'none',
-      'max-snippet': -1,
-    },
-  },
-};
+// Removed static metadata export:
+// export const metadata: Metadata = { ... };
 
 
 function SubmitButton() {
@@ -57,6 +43,10 @@ export default function GeneratePostPage() {
   const [state, formAction] = useActionState(handleGeneratePost, initialState);
   const { toast } = useToast();
   const router = useRouter();
+
+  useEffect(() => {
+    document.title = 'Generate New Post (Admin)';
+  }, []);
 
   useEffect(() => {
     if (state.message) {
