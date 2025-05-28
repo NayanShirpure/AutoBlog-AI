@@ -34,7 +34,7 @@ const prompt = ai.definePrompt({
 The post must include:
 1. An engaging introduction.
 2. At least 7-10 distinct, well-developed sections covering the topic in depth. Provide comprehensive explanations, practical examples, data, or unique insights in each section.
-3. Identify up to 3 (three) key moments or sections within the blog post where a relevant, illustrative image would significantly enhance reader understanding or engagement. For each identified location, insert a placeholder in the format: [IMAGE_PLACEHOLDER: "A concise, descriptive prompt for an AI image generator that visually represents this section's content. For example: 'A futuristic cityscape with flying cars' or 'A detailed infographic showing the carbon cycle'."]
+3. Identify up to 1 (one) key moment or section within the blog post where a relevant, illustrative image would significantly enhance reader understanding or engagement. For this identified location, insert a placeholder in the format: [IMAGE_PLACEHOLDER: "A concise, descriptive prompt for an AI image generator that visually represents this section's content, optimized for web display and reasonable file size. For example: 'A futuristic cityscape with flying cars, web-optimized' or 'A detailed infographic showing the carbon cycle, web-optimized'."]
 4. A strong concluding section that summarizes key takeaways and offers a final thought.
 5. Generate 3-5 tags that are highly relevant to the main subject matter and key concepts discussed in the blog post. These tags should be specific and help readers find posts on similar topics. For example, for a post about "The Future of AI in Healthcare", good tags might be "Artificial Intelligence", "Healthcare Technology", "Machine Learning", "Medical Innovation". Tags should be suitable for categorizing the post on a blog and preferably in title case (e.g., "Artificial Intelligence" not "artificial intelligence").
 
@@ -44,7 +44,7 @@ The image prompts should be specific to the content of the section they are inte
 Strive for natural integration of these image placeholders within the flow of the text.
 Example of a placeholder:
 This is a paragraph discussing the future of AI.
-[IMAGE_PLACEHOLDER: "An advanced AI robot interacting with humans in a collaborative environment"]
+[IMAGE_PLACEHOLDER: "An advanced AI robot interacting with humans in a collaborative environment, web-optimized"]
 And the text continues after the placeholder.
 
 The response should be a JSON object matching the output schema, including the 'content' (markdown blog post) and 'tags' (array of strings).
