@@ -3,7 +3,7 @@ import { getAllPosts, type PostMeta } from '@/lib/posts';
 import { PostCard } from '@/components/PostCard';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Sparkles, ArrowRight } from 'lucide-react';
+import { Sparkles, ArrowRight, UserCircle } from 'lucide-react';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 
@@ -12,13 +12,13 @@ const homePageOgImage = `https://placehold.co/1200x630.png?text=Welcome+to+My+Aw
 
 export const metadata: Metadata = {
   title: 'My Awesome Blog - Homepage',
-  description: 'Welcome to My Awesome Blog. Discover insightful articles, generated with a touch of AI.',
+  description: 'Welcome to My Awesome Blog. Discover insightful articles and stories by Blog Author.', // Updated description
   alternates: {
     canonical: siteBaseUrl,
   },
   openGraph: {
     title: 'My Awesome Blog - Homepage',
-    description: 'Welcome to My Awesome Blog. Discover insightful articles, generated with a touch of AI.',
+    description: 'Welcome to My Awesome Blog. Discover insightful articles and stories by Blog Author.', // Updated description
     url: siteBaseUrl,
     images: [
       {
@@ -35,19 +35,24 @@ export const revalidate = 3600; // Revalidate every hour
 
 export default async function HomePage() {
   const allPosts = getAllPosts();
-  const recentPosts = allPosts.slice(0, 3); // Display up to 3 recent posts
+  const recentPosts = allPosts.slice(0, 3); 
 
   const webPageSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
     url: siteBaseUrl,
     name: 'My Awesome Blog - Homepage',
-    description: 'Welcome to My Awesome Blog. Discover insightful articles, generated with a touch of AI.',
+    description: 'Welcome to My Awesome Blog. Discover insightful articles and stories by Blog Author.', // Updated description
     isPartOf: {
       '@type': 'WebSite',
       url: siteBaseUrl,
       name: 'My Awesome Blog',
     },
+    // Optional: Add publisher info if desired
+    // publisher: {
+    //   '@type': 'Person', // Or 'Organization'
+    //   name: 'Blog Author'
+    // }
   };
 
   return (
@@ -58,27 +63,35 @@ export default async function HomePage() {
         key="webpage-schema"
       />
       <div className="space-y-12">
-        <section className="text-center py-16 bg-card rounded-lg shadow-md">
+        <section className="text-center py-12 md:py-20 bg-card rounded-lg shadow-xl">
           <div className="container mx-auto px-4">
-            <Sparkles className="h-16 w-16 text-primary mx-auto mb-6" />
+            {/* You can use a different icon or image here if Sparkles isn't fitting */}
+            <UserCircle className="h-16 w-16 text-primary mx-auto mb-6" /> 
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground mb-6">
               Welcome to My Awesome Blog
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-              Discover insightful articles on various topics. New content added regularly!
+              Hi, I'm [Your Name/Blog Author Name]! Explore my thoughts, stories, and insights on various topics.
             </p>
-            <Button size="lg" asChild className="shadow-lg hover:shadow-xl transition-shadow">
-              <Link href="/blog">
-                Explore Articles <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+              <Button size="lg" asChild className="shadow-lg hover:shadow-xl transition-shadow">
+                <Link href="/blog">
+                  Explore Articles <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild className="shadow-lg hover:shadow-xl transition-shadow">
+                <Link href="/about">
+                  Learn More About Me
+                </Link>
+              </Button>
+            </div>
           </div>
         </section>
         
         {recentPosts.length > 0 && (
           <section>
             <h2 className="text-3xl font-bold tracking-tight text-foreground mb-8 text-center sm:text-left">
-              Recent Articles
+              Latest Articles
             </h2>
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {recentPosts.map((post) => (
