@@ -1,9 +1,9 @@
 
 import Link from 'next/link';
-import { Newspaper, Sparkles, HomeIcon, Tags, Info, MessageSquare, Menu } from 'lucide-react'; // Added Menu icon
+import { Newspaper, Sparkles, HomeIcon, Tags, Info, MessageSquare, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet'; // Added Sheet components
+import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
 export function Header() {
   const navLinks = [
@@ -46,6 +46,9 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[280px] p-6">
+              <SheetHeader className="mb-4">
+                <SheetTitle className="text-left">Navigation Menu</SheetTitle>
+              </SheetHeader>
               <nav className="flex flex-col space-y-3">
                 {navLinks.map((link) => (
                   <SheetClose asChild key={link.href}>
