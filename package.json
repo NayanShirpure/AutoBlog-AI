@@ -1,7 +1,8 @@
 {
-  "name": "nextn",
+  "name": "my-awesome-blog",
   "version": "0.1.0",
   "private": true,
+  "description": "A Next.js blog powered by AI content generation.",
   "scripts": {
     "dev": "next dev --turbopack -p 9002",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
