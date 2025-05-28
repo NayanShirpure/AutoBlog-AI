@@ -12,7 +12,26 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal, Sparkles, Loader2, KeyRound, Copy } from 'lucide-react';
-import { Textarea } from '@/components/ui/textarea'; // Added Textarea import
+import { Textarea } from '@/components/ui/textarea';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Generate New Post (Admin)',
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'none',
+      'max-snippet': -1,
+    },
+  },
+};
+
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -34,7 +53,7 @@ function SubmitButton() {
 }
 
 export default function GeneratePostPage() {
-  const initialState: GeneratePostFormState = { message: '', success: false };
+  const initialState: GeneratePostFormState = { message: '', success: false, postStatus: undefined };
   const [state, formAction] = useActionState(handleGeneratePost, initialState);
   const { toast } = useToast();
   const router = useRouter();
@@ -128,7 +147,7 @@ export default function GeneratePostPage() {
                   ? `Generated Content for "${state.slug}.mdx"`
                   : `Post Content for "${state.slug || 'post'}.mdx" (Save Manually)` }
               </Label>
-              <Alert variant={state.postStatus === 'error' ? 'destructive' : 'default'}>
+              <Alert variant={state.postStatus === 'error' && state.postStatus !== 'generated_not_saved' ? 'destructive' : 'default'}>
                 <Terminal className="h-4 w-4" />
                 <AlertTitle>
                     {state.postStatus === 'generated_not_saved' ? 'Action Required' : 'Content for Manual Saving'}

@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
-Disallow: /private/
+Disallow: /generate
 
 Sitemap: https://auto-blog-ai-alpha.vercel.app/sitemap.xml
