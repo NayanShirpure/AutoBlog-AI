@@ -37,7 +37,7 @@ The post must include:
 2. At least 7-10 distinct, well-developed sections covering the topic in depth. Provide comprehensive explanations, practical examples, data, or unique insights in each section.
 3. Identify up to 1 (one) key moment or section within the blog post where a relevant, illustrative image would significantly enhance reader understanding or engagement. For this identified location, insert a placeholder in the format: [IMAGE_PLACEHOLDER: "A concise, descriptive prompt for an AI image generator. The image should visually represent this section's content. CRITICAL: Prioritize generating an image that is highly web-optimized for a very small file size (e.g., under 150KB if possible, use simpler styles if needed to achieve this). For example: 'A minimalist flat design graphic of a neural network, web-optimized for tiny file size' or 'A clean line art diagram showing the water cycle, optimized for fast loading and small file size'."]
 4. A strong concluding section that summarizes key takeaways and offers a final thought.
-5. Generate 3-5 tags that are highly relevant to the main subject matter and key concepts discussed in the blog post. These tags should be specific and help readers find posts on similar topics. For example, for a post about "The Future of AI in Healthcare", good tags might be "Artificial Intelligence", "Healthcare Technology", "Machine Learning", "Medical Innovation". Tags should be suitable for categorizing the post on a blog and preferably in title case (e.g., "Artificial Intelligence" not "artificial intelligence").
+5. Generate 3-5 tags that are highly relevant to the main subject matter and key concepts discussed in the blog post. These tags should be specific and help readers find posts on similar topics. For a post about "The Future of AI in Healthcare", good tags might be "Artificial Intelligence", "Healthcare Technology", "Machine Learning", "Medical Innovation". Tags should be suitable for categorizing the post on a blog and preferably in title case (e.g., "Artificial Intelligence" not "artificial intelligence").
 
 Ensure the entire content is well-structured, informative, and engaging for the reader. Use markdown for all formatting.
 Do not include a hero image placeholder; only include placeholders for inline images as described above.
@@ -65,6 +65,5 @@ const generateBlogPostFlow = ai.defineFlow(
 );
 
 // Ensure this file is treated as a server module by Next.js
-export const config = {
-  runtime: 'nodejs', // or 'edge' if applicable and compatible
-};
+// The 'config' export for runtime was removed as it's not allowed in 'use server' files.
+// The runtime for server actions and server-imported modules is typically Node.js by default in Next.js.
