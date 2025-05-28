@@ -22,6 +22,8 @@ export async function generateStaticParams() {
   }));
 }
 
+export const revalidate = 3600; // Revalidate every hour
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = getPostBySlug(params.slug);
 

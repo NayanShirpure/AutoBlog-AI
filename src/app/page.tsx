@@ -1,3 +1,4 @@
+
 import { getAllPosts, type PostMeta } from '@/lib/posts';
 import { PostCard } from '@/components/PostCard';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,8 @@ export const metadata: Metadata = {
     ],
   },
 };
+
+export const revalidate = 3600; // Revalidate every hour
 
 export default async function HomePage() {
   const allPosts = getAllPosts();

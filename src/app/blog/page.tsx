@@ -1,3 +1,4 @@
+
 import { getAllPosts, type PostMeta } from '@/lib/posts';
 import { PostCard } from '@/components/PostCard';
 import type { Metadata } from 'next';
@@ -26,6 +27,8 @@ export const metadata: Metadata = {
     ],
   },
 };
+
+export const revalidate = 3600; // Revalidate every hour
 
 // Simple pagination (can be expanded later)
 const POSTS_PER_PAGE = 9;
