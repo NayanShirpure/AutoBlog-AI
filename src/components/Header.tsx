@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import { Newspaper, Sparkles, HomeIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -25,13 +26,14 @@ export function Header() {
               Blog
             </Link>
           </Button>
-          {/* The Generate Post link remains, leading to the now protected page */}
+          {/* The Generate Post link is removed from public view
           <Button asChild>
             <Link href="/generate" className="flex items-center gap-1 text-sm font-medium">
               <Sparkles className="h-4 w-4" />
               Generate Post
             </Link>
           </Button>
+          */}
           <ThemeToggle />
         </nav>
       </div>
