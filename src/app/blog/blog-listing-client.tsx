@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label'; // Added import for Label
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Tags } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
