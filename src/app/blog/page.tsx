@@ -1,5 +1,5 @@
 
-import { getAllPosts, type PostMeta } from '@/lib/posts';
+import { getAllPosts, getAllTags, type PostMeta } from '@/lib/posts';
 import BlogListingClient from './blog-listing-client';
 import type { Metadata } from 'next';
 
@@ -30,8 +30,10 @@ export const metadata: Metadata = {
 export default async function BlogPageServer({
   searchParams,
 }: {
-  searchParams?: { page?: string; search?: string };
+  searchParams?: { page?: string; search?: string; tag?: string };
 }) {
   const allPostsData = getAllPosts();
-  return <BlogListingClient initialPosts={allPostsData} searchParams={searchParams} />;
+  const allTags = getAllTags();
+  return <BlogListingClient initialPosts={allPostsData} allTags={allTags} searchParams={searchParams} />;
 }
+

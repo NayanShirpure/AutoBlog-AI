@@ -8,8 +8,10 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Search, Tags } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
+import { slugify } from '@/lib/utils';
 
 const siteBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://auto-blog-ai-alpha.vercel.app/';
 
@@ -17,25 +19,24 @@ const POSTS_PER_PAGE = 9;
 
 export default function BlogListingClient({
   initialPosts,
+  allTags,
   searchParams,
 }: {
   initialPosts: PostMeta[];
-  searchParams?: { page?: string; search?: string };
+  allTags: string[];
+  searchParams?: { page?: string; search?: string; tag?: string };
 }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Initialize searchTerm from URL query parameters, or default to empty string
   const [searchTerm, setSearchTerm] = useState(searchParams?.search || '');
-  // Initialize allPosts state with the posts fetched on the server
+  const [selectedTag, setSelectedTag] = useState(searchParams?.tag || ''); // Stores slugified tag
   const [allPosts, setAllPosts] = useState<PostMeta[]>(initialPosts);
 
-  // Update allPosts if initialPosts prop changes (e.g., on navigation if data is re-fetched)
   useEffect(() => {
     setAllPosts(initialPosts);
   }, [initialPosts]);
 
-  // Effect to update URL when searchTerm changes
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (searchTerm) {
@@ -43,22 +44,34 @@ export default function BlogListingClient({
     } else {
       params.delete('search');
     }
-    // Reset page to 1 when search term changes
+    if (selectedTag) {
+      params.set('tag', selectedTag);
+    } else {
+      params.delete('tag');
+    }
     params.delete('page'); 
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [searchTerm, pathname, router]);
+  }, [searchTerm, selectedTag, pathname, router]);
 
 
   const filteredPosts = useMemo(() => {
-    if (!searchTerm) {
-      return allPosts;
+    let postsToFilter = allPosts;
+
+    if (selectedTag) {
+      postsToFilter = postsToFilter.filter(post => 
+        post.tags?.some(pt => slugify(pt) === selectedTag)
+      );
     }
-    return allPosts.filter(post => 
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
-  }, [allPosts, searchTerm]);
+
+    if (searchTerm) {
+      postsToFilter = postsToFilter.filter(post => 
+        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    }
+    return postsToFilter;
+  }, [allPosts, searchTerm, selectedTag]);
 
   const currentPage = Number(searchParams?.page) || 1;
   
@@ -76,7 +89,7 @@ export default function BlogListingClient({
     '@type': 'CollectionPage',
     name: 'Blog | My Awesome Blog',
     description: 'Browse all articles and insights on My Awesome Blog.',
-    url: `${siteBaseUrl}/blog`,
+    url: `${siteBaseUrl}/blog${selectedTag ? `?tag=${selectedTag}` : ''}`,
     isPartOf: {
       '@type': 'WebSite',
       url: siteBaseUrl,
@@ -85,7 +98,6 @@ export default function BlogListingClient({
   };
   useEffect(() => {
     const scriptId = 'collectionpage-schema';
-    // Remove existing script if it exists
     const existingScript = document.head.querySelector(`script[data-id="${scriptId}"]`);
     if (existingScript) {
       document.head.removeChild(existingScript);
@@ -94,20 +106,19 @@ export default function BlogListingClient({
     const script = document.createElement('script');
     script.type = 'application/ld+json';
     script.innerHTML = JSON.stringify(collectionPageSchema);
-    script.setAttribute('data-id', scriptId); // Add an attribute to identify the script
+    script.setAttribute('data-id', scriptId); 
     document.head.appendChild(script);
     
-    // Cleanup function to remove the script when the component unmounts or re-renders
     return () => {
        const scriptToRemove = document.head.querySelector(`script[data-id="${scriptId}"]`);
         if (scriptToRemove) {
             document.head.removeChild(scriptToRemove);
         }
     };
-  }, [searchTerm, currentPage]); // Re-run if search term or page changes to update schema potentially, though schema content is static
+  }, [searchTerm, currentPage, selectedTag]);
 
 
-  if (initialPosts.length === 0 && !searchTerm) {
+  if (initialPosts.length === 0 && !searchTerm && !selectedTag) {
     return (
       <>
         <div className="text-center py-12">
@@ -135,10 +146,17 @@ export default function BlogListingClient({
     setSearchTerm(e.target.value);
   };
 
+  const handleTagChange = (tagSlug: string) => {
+    setSelectedTag(tagSlug === 'all' ? '' : tagSlug);
+  };
+
   const buildPageLink = (pageNumber: number) => {
     const params = new URLSearchParams();
     if (searchTerm) {
       params.set('search', searchTerm);
+    }
+    if (selectedTag) {
+      params.set('tag', selectedTag);
     }
     if (pageNumber > 1) {
       params.set('page', pageNumber.toString());
@@ -160,9 +178,11 @@ export default function BlogListingClient({
           </p>
         </header>
 
-        <div className="mb-8 max-w-xl mx-auto">
+        <div className="mb-8 max-w-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
           <div className="relative">
+            <Label htmlFor="search-input" className="sr-only">Search Articles</Label>
             <Input 
+              id="search-input"
               type="search"
               placeholder="Search articles by title, summary, or tag..."
               className="pl-10 text-base"
@@ -171,6 +191,25 @@ export default function BlogListingClient({
             />
             <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
           </div>
+          {allTags.length > 0 && (
+            <div>
+              <Label htmlFor="tag-filter" className="sr-only">Filter by Tag</Label>
+              <Select value={selectedTag} onValueChange={handleTagChange}>
+                <SelectTrigger id="tag-filter" className="w-full text-base">
+                  <div className="flex items-center">
+                    <Tags className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <SelectValue placeholder="Filter by tag..." />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Tags</SelectItem>
+                  {allTags.map(tag => (
+                    <SelectItem key={tag} value={slugify(tag)}>{tag}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
         
         {paginatedPosts.length > 0 ? (
@@ -189,7 +228,7 @@ export default function BlogListingClient({
               className="mx-auto mb-4 rounded-md"
               data-ai-hint="no results"
             />
-            <p className="text-muted-foreground">No articles found matching your search criteria.</p>
+            <p className="text-muted-foreground">No articles found matching your criteria.</p>
           </div>
         )}
 
@@ -215,3 +254,4 @@ export default function BlogListingClient({
     </>
   );
 }
+
