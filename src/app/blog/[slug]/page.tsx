@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: post.summary,
       type: 'article',
       publishedTime: new Date(post.date).toISOString(),
-      modifiedTime: new Date(post.date).toISOString(),
+      modifiedTime: new Date(post.date).toISOString(), // Using post.date as modifiedTime for simplicity
       url: `${siteBaseUrl}blog/${post.slug}`,
       images: ogImageUrl ? [
         {
@@ -66,7 +66,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           alt: post.title,
         }
       ] : [],
-      authors: ['Blog Author'],
+      authors: ['Blog Author'], // Replace or make dynamic if needed
       tags: post.tags,
     },
     twitter: {
@@ -75,17 +75,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: post.summary,
       images: ogImageUrl ? [ogImageUrl] : [],
     },
+    alternates: {
+      canonical: `${siteBaseUrl}blog/${post.slug}`,
+    }
   };
 }
 
 // Custom MDX components
 const mdxComponents = {
-  // eslint-disable-next-line @next/next/no-img-element
-  img: ({ className: mdxClassName, style: mdxStyle, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => {
-    const { class: htmlClass, ...restOfProps } = props as any; 
-    const combinedClassName = cn(htmlClass, mdxClassName);
-    return <img {...restOfProps} className={combinedClassName} alt={props.alt || ""} />;
+  img: (props: React.ImgHTMLAttributes<HTMLImageElement> & { class?: string }) => {
+    const htmlClassAttribute = props.class; // from HTML 'class'
+    const jsxClassNameProp = props.className; // from JSX 'className'
+
+    // Combine them, `cn` handles undefined values gracefully.
+    const finalClassName = cn(htmlClassAttribute, jsxClassNameProp);
+
+    // Create a new props object to pass down, explicitly excluding 'class' and 'className'
+    // from the original props to prevent them from being spread onto the native <img> element.
+    const { class: _htmlClass, className: _jsxClassName, ...restOfProps } = props;
+
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img {...restOfProps} className={finalClassName} alt={props.alt || ""} />;
   },
+  // You can add other custom components here if needed
+  // e.g., h1: (props) => <h1 className="text-3xl font-bold my-4" {...props} />,
 };
 
 
@@ -116,22 +129,22 @@ export default async function PostPage({ params }: Props) {
     },
     headline: post.title,
     description: post.summary,
-    image: schemaImage,
+    image: schemaImage, // Use the determined image URL
     author: {
-      '@type': 'Person',
-      name: 'Blog Author',
+      '@type': 'Person', // Or 'Organization'
+      name: 'Blog Author', // Replace with your name or organization
     },
     publisher: {
       '@type': 'Organization',
       name: 'My Awesome Blog',
       logo: {
         '@type': 'ImageObject',
-        url: `https://placehold.co/200x60.png?text=My+Awesome+Blog+Logo`,
+        url: `https://placehold.co/200x60.png?text=My+Awesome+Blog+Logo`, // Replace with your actual logo URL
       },
       url: siteBaseUrl,
     },
     datePublished: new Date(post.date).toISOString(),
-    dateModified: new Date(post.date).toISOString(),
+    dateModified: new Date(post.date).toISOString(), // Use post.date for simplicity
     keywords: post.tags?.join(', '),
   };
 
