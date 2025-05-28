@@ -74,10 +74,20 @@ export async function handleGeneratePost(
       // Proceed without tags, or assign default tags if preferred
     }
 
+    // 2. Generate summary from the original AI content (before image embedding)
+    const summarizeInput: SummarizeBlogPostInput = { blogPostContent: blogPostOutput.content };
+    const summaryOutput = await summarizeBlogPost(summarizeInput);
+
+    if (!summaryOutput.summary) {
+      // Allow proceeding without a summary if it fails, but log it.
+      console.warn('AI failed to generate summary. Proceeding without summary.');
+    }
+    const postSummary = summaryOutput.summary || "Summary not available.";
+
 
     let finalContent = blogPostOutput.content;
 
-    // 2. Generate hero image
+    // 3. Generate hero image
     let heroImageDataUri: string | undefined = undefined;
     try {
       const heroImagePrompt = `A visually compelling and highly relevant hero image for a blog post titled: "${title}". The image should directly reflect the core subject matter of the title. Avoid text in the image. Style: modern, clean, professional.`;
@@ -88,10 +98,11 @@ export async function handleGeneratePost(
       console.warn('Hero image generation failed, proceeding without hero image:', imageError instanceof Error ? imageError.message : String(imageError));
     }
 
-    // 3. Parse content for inline image placeholders and generate images
+    // 4. Parse content for inline image placeholders and generate images
     const imagePlaceholderRegex = /\[IMAGE_PLACEHOLDER:\s*"([^"]+)"\]/g;
     const inlineImagePrompts: string[] = [];
     let match;
+    // Use blogPostOutput.content for finding placeholders, as finalContent might be modified
     while ((match = imagePlaceholderRegex.exec(blogPostOutput.content)) !== null) {
       inlineImagePrompts.push(match[1]);
     }
@@ -102,6 +113,7 @@ export async function handleGeneratePost(
       );
 
       let currentPlaceholderIndex = 0;
+      // Replace placeholders in the `finalContent` variable
       finalContent = finalContent.replace(imagePlaceholderRegex, () => {
         const promptForAlt = inlineImagePrompts[currentPlaceholderIndex];
         const result = generatedImageResults[currentPlaceholderIndex];
@@ -120,19 +132,11 @@ export async function handleGeneratePost(
       });
     }
 
-    // 4. Generate summary
-    const summarizeInput: SummarizeBlogPostInput = { blogPostContent: finalContent };
-    const summaryOutput = await summarizeBlogPost(summarizeInput);
-
-    if (!summaryOutput.summary) {
-      return { message: 'AI failed to generate summary.', success: false };
-    }
-
     // 5. Create post file with final content, hero image, and tags
     const newSlug = await createPostFile(
       title, 
       finalContent, 
-      summaryOutput.summary, 
+      postSummary, // Use the generated summary
       heroImageDataUri,
       blogPostOutput.tags 
     );
