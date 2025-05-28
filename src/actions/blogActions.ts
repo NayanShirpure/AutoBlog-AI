@@ -137,3 +137,8 @@ export async function handleGeneratePost(
     console.error('Error generating post:', error);
     let errorMessage = 'An unexpected error occurred while generating the post.';
     if (error instanceof Error) {
+      errorMessage = `Failed to generate post: ${error.message}`;
+    }
+    return { message: errorMessage, success: false };
+  }
+}
