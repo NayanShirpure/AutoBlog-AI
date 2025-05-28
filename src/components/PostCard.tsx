@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import type { PostMeta } from '@/lib/posts';
-import { slugify } from '@/lib/posts';
+import { slugify } from '@/lib/utils'; // Updated import
 import { format } from 'date-fns';
 import { CalendarDays, ArrowRight, Tag } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';

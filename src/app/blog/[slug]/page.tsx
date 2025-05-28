@@ -1,5 +1,6 @@
 
-import { getPostBySlug, getPostSlugs, type Post, slugify } from '@/lib/posts';
+import { getPostBySlug, getPostSlugs, type Post } from '@/lib/posts';
+import { slugify } from '@/lib/utils'; // Updated import path for slugify
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';

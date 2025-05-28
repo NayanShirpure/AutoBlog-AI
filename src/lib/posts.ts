@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import {formatISO} from 'date-fns';
+import { slugify } from '@/lib/utils'; // Updated import
 
 const postsDirectory = path.join(process.cwd(), 'content/posts');
 
@@ -102,17 +103,6 @@ export function getAllTags(): string[] {
   return Array.from(allTags).sort();
 }
 
-export function slugify(text: string): string {
-  return text
-    .toString()
-    .toLowerCase()
-    .replace(/\s+/g, '-') // Replace spaces with -
-    .replace(/[^\w-]+/g, '') // Remove all non-word chars
-    .replace(/--+/g, '-') // Replace multiple - with single -
-    .replace(/^-+/, '') // Trim - from start of text
-    .replace(/-+$/, ''); // Trim - from end of text
-}
-
 
 export async function createPostFile(
   title: string, 
@@ -121,7 +111,7 @@ export async function createPostFile(
   featuredImage?: string,
   tags?: string[]
 ): Promise<string> {
-  const slug = slugify(title);
+  const slug = slugify(title); // Uses slugify from utils
   const date = formatISO(new Date());
 
   let frontmatterContent = `---

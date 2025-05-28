@@ -1,5 +1,6 @@
 // src/app/blog/tags/[tag]/page.tsx
-import { getAllPosts, getAllTags, type PostMeta, slugify } from '@/lib/posts';
+import { getAllPosts, getAllTags, type PostMeta } from '@/lib/posts';
+import { slugify } from '@/lib/utils'; // Updated import
 import { PostCard } from '@/components/PostCard';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -17,7 +18,7 @@ type Props = {
 export async function generateStaticParams() {
   const tags = getAllTags();
   return tags.map((tag) => ({
-    tag: slugify(tag),
+    tag: slugify(tag), // Uses slugify from utils
   }));
 }
 
@@ -25,7 +26,7 @@ export const revalidate = 3600; // Revalidate every hour
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const allTags = getAllTags();
-  const originalTag = allTags.find(t => slugify(t) === params.tag);
+  const originalTag = allTags.find(t => slugify(t) === params.tag); // Uses slugify from utils
 
   if (!originalTag) {
     return {
@@ -54,14 +55,14 @@ export default async function TagPage({ params }: Props) {
   const { tag: tagSlug } = params;
   const allPosts = getAllPosts();
   const allTags = getAllTags();
-  const originalTag = allTags.find(t => slugify(t) === tagSlug);
+  const originalTag = allTags.find(t => slugify(t) === tagSlug); // Uses slugify from utils
 
   if (!originalTag) {
     notFound();
   }
 
   const postsWithTag = allPosts.filter(post => 
-    post.tags?.some(pt => slugify(pt) === tagSlug)
+    post.tags?.some(pt => slugify(pt) === tagSlug) // Uses slugify from utils
   );
 
   const pageSchema = {
