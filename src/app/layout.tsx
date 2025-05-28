@@ -10,13 +10,13 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
-  display: 'optional', // Explicitly set for clarity
+  display: 'optional',
 });
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
-  display: 'optional', // Explicitly set for clarity
+  display: 'optional',
 });
 
 const siteBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://auto-blog-ai-alpha.vercel.app/';
@@ -59,7 +59,11 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  // Add more metadata as needed, like icons, manifest, etc.
+  alternates: {
+    types: {
+      'application/rss+xml': [{ url: 'rss.xml', title: 'RSS Feed for My Awesome Blog' }],
+    },
+  },
 };
 
 export default function RootLayout({
@@ -75,7 +79,7 @@ export default function RootLayout({
     description: 'Welcome to My Awesome Blog. Discover interesting articles and insights.',
     potentialAction: {
       '@type': 'SearchAction',
-      target: `${siteBaseUrl}/blog?q={search_term_string}`,
+      target: `${siteBaseUrl}/blog?q={search_term_string}`, // Changed to q for consistency with common search params
       'query-input': 'required name=search_term_string',
     },
   };
@@ -87,6 +91,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteSchema) }}
         />
+        <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="/rss.xml" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}>
         <ThemeProvider

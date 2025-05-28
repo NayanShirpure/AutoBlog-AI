@@ -4,7 +4,7 @@
 
 import { generateBlogPost, type GenerateBlogPostInput } from '@/ai/flows/generate-blog-post';
 import { summarizeBlogPost, type SummarizeBlogPostInput } from '@/ai/flows/summarize-blog-posts';
-import { generateBlogImage, type GenerateBlogImageInput, type GenerateBlogImageOutput } from '@/ai/flows/generate-blog-image-flow';
+import { generateBlogImage, type GenerateBlogImageInput } from '@/ai/flows/generate-blog-image-flow';
 import { createPostFile } from '@/lib/posts';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
@@ -62,13 +62,18 @@ export async function handleGeneratePost(
   }
 
   try {
-    // 1. Generate blog post content (may include image placeholders)
+    // 1. Generate blog post content and tags
     const generateInput: GenerateBlogPostInput = { title };
     const blogPostOutput = await generateBlogPost(generateInput);
     
     if (!blogPostOutput.content) {
       return { message: 'AI failed to generate blog post content.', success: false };
     }
+    if (!blogPostOutput.tags || blogPostOutput.tags.length === 0) {
+      console.warn("AI did not generate tags for the post.");
+      // Proceed without tags, or assign default tags if preferred
+    }
+
 
     let finalContent = blogPostOutput.content;
 
@@ -103,35 +108,45 @@ export async function handleGeneratePost(
         currentPlaceholderIndex++;
         
         if (result.status === 'fulfilled' && result.value.imageDataUri) {
-          // Sanitize alt text: remove quotes and potentially other characters
-          const sanitizedAlt = promptForAlt.replace(/"/g, "'").substring(0, 200); // Limit alt text length
+          const sanitizedAlt = promptForAlt.replace(/"/g, "'").substring(0, 200);
           return `<img src="${result.value.imageDataUri}" alt="${sanitizedAlt}" class="my-6 rounded-lg shadow-xl mx-auto block max-w-full h-auto aspect-video object-cover" />`;
         } else {
           console.warn(`Failed to generate inline image for prompt: "${promptForAlt}". Placeholder will be removed.`);
           if (result.status === 'rejected') {
             console.error('Reason for inline image failure:', result.reason);
           }
-          return ''; // Remove placeholder if image generation failed
+          return ''; 
         }
       });
     }
 
     // 4. Generate summary
-    const summarizeInput: SummarizeBlogPostInput = { blogPostContent: finalContent }; // Use finalContent for summary
+    const summarizeInput: SummarizeBlogPostInput = { blogPostContent: finalContent };
     const summaryOutput = await summarizeBlogPost(summarizeInput);
 
     if (!summaryOutput.summary) {
       return { message: 'AI failed to generate summary.', success: false };
     }
 
-    // 5. Create post file with final content and hero image
-    const newSlug = await createPostFile(title, finalContent, summaryOutput.summary, heroImageDataUri);
+    // 5. Create post file with final content, hero image, and tags
+    const newSlug = await createPostFile(
+      title, 
+      finalContent, 
+      summaryOutput.summary, 
+      heroImageDataUri,
+      blogPostOutput.tags 
+    );
 
     revalidatePath('/');
     revalidatePath('/blog');
     revalidatePath(`/blog/${newSlug}`);
+    (blogPostOutput.tags || []).forEach(tag => {
+      revalidatePath(`/blog/tags/${tag.toLowerCase().replace(/\s+/g, '-')}`);
+    });
+    revalidatePath('/rss.xml');
 
-    return { message: 'Blog post generated successfully with inline images!', success: true, slug: newSlug };
+
+    return { message: 'Blog post generated successfully with inline images and tags!', success: true, slug: newSlug };
 
   } catch (error) {
     console.error('Error generating post:', error);

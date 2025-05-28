@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import type { PostMeta } from '@/lib/posts';
+import { slugify } from '@/lib/posts';
 import { format } from 'date-fns';
-import { CalendarDays, ArrowRight } from 'lucide-react';
+import { CalendarDays, ArrowRight, Tag } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface PostCardProps {
   post: PostMeta;
@@ -24,6 +26,17 @@ export function PostCard({ post }: PostCardProps) {
         <CardDescription className="line-clamp-3 text-sm">
           {post.summary}
         </CardDescription>
+        {post.tags && post.tags.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {post.tags.slice(0, 3).map((tag) => ( // Show up to 3 tags
+              <Badge key={tag} variant="secondary" className="text-xs">
+                <Link href={`/blog/tags/${slugify(tag)}`} className="hover:underline">
+                  {tag}
+                </Link>
+              </Badge>
+            ))}
+          </div>
+        )}
       </CardContent>
       <CardFooter>
         <Link href={`/blog/${post.slug}`} className="text-sm font-medium text-accent-foreground hover:text-accent-foreground/90 flex items-center">

@@ -11,7 +11,8 @@ export interface Post {
   date: string;
   summary: string;
   content: string;
-  featuredImage?: string; // Added for AI generated image
+  featuredImage?: string;
+  tags?: string[];
   [key: string]: any; // For any other frontmatter properties
 }
 
@@ -19,8 +20,9 @@ export interface PostMeta {
   slug: string;
   title: string;
   date: string;
-  summary: string;
-  featuredImage?: string; // Added for AI generated image
+  summary:string;
+  featuredImage?: string;
+  tags?: string[];
   [key: string]: any;
 }
 
@@ -47,7 +49,8 @@ export function getPostBySlug(slug: string): Post | null {
       title: data.title || 'Untitled Post',
       date: data.date ? new Date(data.date).toISOString() : new Date().toISOString(),
       summary: data.summary || '',
-      featuredImage: data.featuredImage, // Read featuredImage
+      featuredImage: data.featuredImage,
+      tags: data.tags || [],
       content,
       ...data,
     };
@@ -74,7 +77,8 @@ export function getAllPosts(): PostMeta[] {
           title: data.title || 'Untitled Post',
           date: data.date ? new Date(data.date).toISOString() : new Date().toISOString(),
           summary: data.summary || 'No summary available.',
-          featuredImage: data.featuredImage, // Read featuredImage
+          featuredImage: data.featuredImage,
+          tags: data.tags || [],
           ...data,
         };
       })
@@ -89,22 +93,38 @@ export function getAllPosts(): PostMeta[] {
   }
 }
 
+export function getAllTags(): string[] {
+  const allPosts = getAllPosts();
+  const allTags = new Set<string>();
+  allPosts.forEach(post => {
+    post.tags?.forEach(tag => allTags.add(tag));
+  });
+  return Array.from(allTags).sort();
+}
+
+export function slugify(text: string): string {
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, '-') // Replace spaces with -
+    .replace(/[^\w-]+/g, '') // Remove all non-word chars
+    .replace(/--+/g, '-') // Replace multiple - with single -
+    .replace(/^-+/, '') // Trim - from start of text
+    .replace(/-+$/, ''); // Trim - from end of text
+}
+
+
 export async function createPostFile(
   title: string, 
   content: string, 
   summary: string,
-  featuredImage?: string // New parameter for image data URI
+  featuredImage?: string,
+  tags?: string[]
 ): Promise<string> {
-  const slug = title
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, '') 
-    .replace(/\s+/g, '-') 
-    .replace(/--+/g, '-') 
-    .replace(/^-+|-+$/g, ''); 
-
+  const slug = slugify(title);
   const date = formatISO(new Date());
 
-  let frontmatter = `---
+  let frontmatterContent = `---
 title: "${title.replace(/"/g, '\\"')}"
 date: "${date}"
 slug: "${slug}"
@@ -112,12 +132,14 @@ summary: "${summary.replace(/"/g, '\\"')}"
 `;
 
   if (featuredImage) {
-    // Ensure the data URI is properly quoted if it contains special characters,
-    // though base64 itself should be fine. Using double quotes for consistency.
-    frontmatter += `featuredImage: "${featuredImage}"\n`;
+    frontmatterContent += `featuredImage: "${featuredImage}"\n`;
   }
 
-  frontmatter += `---
+  if (tags && tags.length > 0) {
+    frontmatterContent += `tags:\n${tags.map(tag => `  - "${tag.replace(/"/g, '\\"')}"`).join('\n')}\n`;
+  }
+
+  frontmatterContent += `---
 
 ${content}
 `;
@@ -127,7 +149,7 @@ ${content}
   }
 
   const filePath = path.join(postsDirectory, `${slug}.mdx`);
-  fs.writeFileSync(filePath, frontmatter);
+  fs.writeFileSync(filePath, frontmatterContent);
   
   return slug;
 }
