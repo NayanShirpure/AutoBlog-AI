@@ -11,7 +11,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Terminal, Sparkles, Loader2, KeyRound } from 'lucide-react';
+import { Terminal, Sparkles, Loader2, KeyRound, Copy } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea'; // Added Textarea import
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -40,7 +41,7 @@ export default function GeneratePostPage() {
 
   useEffect(() => {
     if (state.message) {
-      if (state.success) {
+      if (state.success && state.postStatus === 'created') {
         toast({
           title: "Success!",
           description: state.message,
@@ -50,12 +51,20 @@ export default function GeneratePostPage() {
         } else {
           router.push('/blog');
         }
-      } else {
+      } else if (state.success && state.postStatus === 'generated_not_saved') {
+        toast({
+          title: "Content Generated!",
+          description: state.message + " See below for content and instructions.",
+          duration: 15000, // Keep it longer
+        });
+        // Do not redirect, content will be shown on the page
+      } else if (!state.success) { // Error state
         toast({
           title: "Error",
           description: state.message,
           variant: "destructive",
         });
+         // Do not redirect on error, generatedContent might be shown for manual recovery
       }
     }
   }, [state, toast, router]);
@@ -112,7 +121,47 @@ export default function GeneratePostPage() {
             </div>
           </form>
           
-          {state.message && !state.success && (
+          {state.generatedContent && (
+            <div className="mt-6 space-y-3 p-4 border rounded-md bg-card">
+              <Label htmlFor="generatedContentOutput" className="text-xl font-semibold">
+                {state.postStatus === 'generated_not_saved' 
+                  ? `Generated Content for "${state.slug}.mdx"`
+                  : `Post Content for "${state.slug || 'post'}.mdx" (Save Manually)` }
+              </Label>
+              <Alert variant={state.postStatus === 'error' ? 'destructive' : 'default'}>
+                <Terminal className="h-4 w-4" />
+                <AlertTitle>
+                    {state.postStatus === 'generated_not_saved' ? 'Action Required' : 'Content for Manual Saving'}
+                </AlertTitle>
+                <AlertDescription>
+                  {state.postStatus === 'generated_not_saved'
+                    ? `The application is running in an environment where it cannot save files directly (e.g., on Vercel). Please copy the content below and save it as '${state.slug}.mdx' in your project's 'content/posts' directory. Then, commit and deploy your changes.`
+                    : `An error occurred: "${state.message}". You can try to manually save the content below as '${state.slug || 'post'}.mdx' in your project's 'content/posts' directory.`}
+                </AlertDescription>
+              </Alert>
+              <Textarea
+                id="generatedContentOutput"
+                readOnly
+                value={state.generatedContent}
+                className="h-96 min-h-[240px] font-mono text-xs bg-muted/50 p-3"
+                aria-label="Generated post content"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  navigator.clipboard.writeText(state.generatedContent || '');
+                  toast({ description: "Content copied to clipboard!" });
+                }}
+                className="mt-2"
+              >
+                <Copy className="mr-2 h-4 w-4" />
+                Copy Content
+              </Button>
+            </div>
+          )}
+
+          {state.message && !state.success && !state.generatedContent && (
              <Alert variant="destructive" className="mt-6">
                 <Terminal className="h-4 w-4" />
                 <AlertTitle>Generation Failed</AlertTitle>
@@ -126,10 +175,9 @@ export default function GeneratePostPage() {
                 </AlertDescription>
             </Alert>
           )}
-
         </CardContent>
          <CardFooter className="text-xs text-muted-foreground">
-            <p>AI generation may take a few moments. Please be patient. Ensure your admin token is set correctly.</p>
+            <p>AI generation may take a few moments. Please be patient. Ensure your admin token is set correctly. In deployed environments, you may need to manually save the generated post file.</p>
         </CardFooter>
       </Card>
     </div>
