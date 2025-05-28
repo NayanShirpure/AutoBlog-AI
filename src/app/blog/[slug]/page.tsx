@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils'; // Import cn utility
 
 
 type Props = {
@@ -64,7 +65,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           alt: post.title,
         }
       ],
-      authors: ['Blog Author'], 
+      authors: ['Blog Author'],
       tags: post.tags,
     },
     twitter: {
@@ -75,6 +76,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
   };
 }
+
+// Custom MDX components
+const mdxComponents = {
+  // eslint-disable-next-line @next/next/no-img-element
+  img: ({ className: mdxClassName, style: mdxStyle, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => {
+    // props might include 'class' if it came from raw HTML in MDX.
+    // props definitely includes 'alt' and 'src' from markdown ![alt](src)
+    // or from our embedded string which already includes a className.
+    const { class: htmlClass, ...restOfProps } = props as any; // Separate out 'class' if it exists from raw HTML
+
+    // Combine mdxClassName (if provided e.g. from our embedded component) and htmlClass (if from raw HTML with class)
+    // The prose-img:* classes will be applied by the parent div with 'prose'.
+    const combinedClassName = cn(htmlClass, mdxClassName);
+
+    return <img {...restOfProps} className={combinedClassName} alt={props.alt || ""} />;
+  },
+};
+
 
 export default async function PostPage({ params }: Props) {
   const post = getPostBySlug(params.slug);
@@ -98,12 +117,12 @@ export default async function PostPage({ params }: Props) {
       ? post.featuredImage
       : `https://placehold.co/1200x630.png?text=${encodeURIComponent(post.title)}`,
     author: {
-      '@type': 'Person', 
+      '@type': 'Person',
       name: 'Blog Author',
     },
     publisher: {
       '@type': 'Organization',
-      name: 'My Awesome Blog', 
+      name: 'My Awesome Blog',
       logo: {
         '@type': 'ImageObject',
         url: `https://placehold.co/200x60.png?text=My+Awesome+Blog+Logo`,
@@ -173,7 +192,7 @@ export default async function PostPage({ params }: Props) {
                         prose-code:bg-muted prose-code:text-foreground prose-code:p-1 prose-code:rounded-md
                         prose-li:marker:text-primary
                         prose-img:rounded-lg prose-img:shadow-md prose-img:my-8 prose-img:mx-auto prose-img:block">
-          <MDXRemote source={post.content} />
+          <MDXRemote source={post.content} components={mdxComponents} />
         </div>
 
         <div className="mt-12 pt-8 border-t">
@@ -183,9 +202,9 @@ export default async function PostPage({ params }: Props) {
           </h3>
           <div className="flex space-x-3">
             <Button variant="outline" size="icon" asChild>
-              <a 
-                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(postUrl)}&text=${encodeURIComponent(post.title)}`} 
-                target="_blank" 
+              <a
+                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(postUrl)}&text=${encodeURIComponent(post.title)}`}
+                target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Share on Twitter"
               >
@@ -193,9 +212,9 @@ export default async function PostPage({ params }: Props) {
               </a>
             </Button>
             <Button variant="outline" size="icon" asChild>
-              <a 
-                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`} 
-                target="_blank" 
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`}
+                target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Share on Facebook"
               >
@@ -203,9 +222,9 @@ export default async function PostPage({ params }: Props) {
               </a>
             </Button>
             <Button variant="outline" size="icon" asChild>
-              <a 
+              <a
                 href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(postUrl)}&title=${encodeURIComponent(post.title)}&summary=${encodeURIComponent(post.summary)}`}
-                target="_blank" 
+                target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Share on LinkedIn"
               >
